@@ -5,6 +5,11 @@ import MainHeader from './MainHeader.tsx';
 
 
 const HelpComponent = () => {
+
+  const examples = (treeData.children ?? []).map((node) =>
+    node.type === "folder" ? `cd ${node.name}` : `cat ${node.name}`
+  );
+
   return (
     <div className="mt-4 text-white text-lg">
       {/* <p> */}
@@ -18,6 +23,21 @@ const HelpComponent = () => {
         <li><span className="text-brand-green">cat</span> - Display file contents</li>
         <li><span className="text-brand-green">help</span> - Show available commands</li>
         <li><span className="text-brand-green">clear</span> - Clear the terminal</li>
+      </ul>
+      <p className="mt-4 text-white">
+        New to the terminal? Try typing any of these:
+      </p>
+      <ul className="my-1 list-none">
+        <li>
+          {/* <span className="text-brand-yellow">$</span>{" "} */}
+          <span className="text-brand-green">ll</span>
+        </li>
+        {examples.map((cmd) => (
+          <li key={cmd}>
+            {/* <span className="text-brand-yellow">$</span>{" "} */}
+            <span className="text-brand-green">{cmd}</span>
+          </li>
+        ))}
       </ul>
     </div>
   );
