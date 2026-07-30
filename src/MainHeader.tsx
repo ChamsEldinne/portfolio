@@ -65,10 +65,10 @@ function MainHeader() {
         {scrambled}
         <span className="cursor-blink">_</span>
       </h1>
-      <p className="mt-4 text-zinc-400 text-lg">
+      <p className="mt-4 text-white text-lg">
         Full Stack Software Engineer
       </p>
-      <p className="mt-2 text-zinc-500">
+      <p className="mt-2 text-white ">
         React • Next.js • Laravel • Node.js • PostgreSQL 
       </p>
       <p className="mt-8 text-brand-green">
