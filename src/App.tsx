@@ -52,7 +52,7 @@ const WrittenCommand = ({cmd , path}: {cmd: string, path: string}) => {
     <span className='text-white w-full flex gap-2 ' >
       <span  className='' >  
         <span  className='text-brand-green' >visitor@portfolio:
-          <span className='text-brand-blue' >/{path}</span>
+          <span className='text-brand-blue' >{path}</span>
         </span>$ 
       </span>
       <span  className="text-white" > {cmd} </span>
@@ -129,7 +129,32 @@ function App() {
       command: "ll",
       description: "List directory contents",
       fuction: (current : TreeNode , cmd : string | null ) => {
-        setConetet(prev => [...prev ,<Container cmd={cmd} path={currentPath} >  <ListChildren children={current.children || []} /> </Container> ]) ;
+
+        const [_, ...args] = cmd?.split(' ') || [] ;
+        
+        if( args.length > 1){
+          setConetet(prev => [...prev , <Container cmd={cmd} path={currentPath} > <TooManyArguments cmd={cmd} /> </Container>  ]) ;
+          return ;
+        }
+        
+        if( args[0] == null || args[0] == ""){
+          setConetet(prev => [...prev ,<Container cmd={cmd} path={currentPath} >  <ListChildren children={current.children || []} /> </Container> ]) ;
+          return ;
+        }
+
+        const startNode = args?.[0]?.startsWith('/') ? treeData : currentNode ;
+
+        const directories  : string[]  = args[0]?.split('/')?.filter(s => s !== "") || [];
+        
+        const node = findeNodeByPath(startNode , directories) ;
+        
+        if( node && node.type === "folder" ){
+
+          setConetet(prev => [...prev ,<Container cmd={cmd} path={currentPath} >  <ListChildren children={node.children || []} /> </Container> ]) ;
+
+        }else {
+          setConetet(prev => [...prev , <Container cmd={cmd} path={currentPath} > <NoSuchFileOrDirectory cmd={cmd} /> </Container>  ]) ;
+        }
       }
     },
     {
@@ -172,6 +197,7 @@ function App() {
         
         if( args.length > 1){
           setConetet(prev => [...prev , <Container cmd={cmd} path={currentPath} > <TooManyArguments cmd={cmd} /> </Container>  ]) ;
+          return ;
         }
         
         if( args[0] == null || args[0] == ""){
@@ -179,7 +205,7 @@ function App() {
           return ;
         }
 
-        const startNode = args[0].startsWith('/') ? treeData : currentNode ;
+        const startNode = args[0]?.startsWith('/') ? treeData : currentNode ;
 
         const directories  : string[]  = args[0]?.split('/')?.filter(s => s !== "") || [];
         
@@ -255,6 +281,34 @@ function App() {
     }
   }
 
+
+  const handlePaste = async (event: React.MouseEvent) => {
+    event.preventDefault(); // suppress the default right-click menu
+
+    try {
+      const text = await navigator.clipboard.readText();
+      if (!text) return;
+
+      const el = inputRef.current;
+      if (!el) return;
+
+      const start = el.selectionStart ?? input.length;
+      const end = el.selectionEnd ?? input.length;
+      const newValue = input.slice(0, start) + text + input.slice(end);
+
+      inputeChange(newValue);
+
+      // restore caret right after the pasted text once React re-renders
+      requestAnimationFrame(() => {
+        el.focus();
+        const pos = start + text.length;
+        el.setSelectionRange(pos, pos);
+      });
+    } catch (err) {
+      console.error("Clipboard read failed:", err);
+    }
+  };
+
   
   return (
     <section className="min-h-screen w-full bg-background p-2" 
@@ -276,11 +330,13 @@ function App() {
         <span className='text-white w-full flex gap-2 ' >
           <span  className='' >  
             <span  className='text-brand-green' >visitor@portfolio:
-              <span className='text-brand-blue' >/{currentPath}</span>
+              <span className='text-brand-blue' >{currentPath}</span>
             </span>$ 
           </span>
           <input  ref={inputRef} autoFocus={true} type="text" className='bg-background flex-1 w-full text-white outline-none border-none'
-          value={input} onChange={handleInputChange} onKeyDown={handleKeyDown} />
+          value={input} onChange={handleInputChange} onKeyDown={handleKeyDown}
+          onContextMenu={handlePaste}
+        />
         </span>
 
       </div>
