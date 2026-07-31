@@ -4,6 +4,60 @@ import treeData, { type TreeNode } from './treeData.tsx'  ;
 import MainHeader from './MainHeader.tsx';
 
 
+ 
+const TreeBranch = ({
+  node,
+  prefix,
+  isLast,
+}: {
+  node: TreeNode;
+  prefix: string;
+  isLast: boolean;
+}) => {
+  const isFolder = node.type === "folder";
+  const connector = isLast ? "└── " : "├── ";
+  const children = node.children ?? [];
+  const childPrefix = prefix + (isLast ? "    " : "│   ");
+ 
+  return (
+    <>
+      <div>
+        <span className="text-zinc-600">{prefix}{connector}</span>
+        <span className={isFolder ? "text-brand-blue" : "text-white"}>
+          {node.name}
+          {isFolder ? "/" : ""}
+        </span>
+      </div>
+      {children.map((child, index) => (
+        <TreeBranch
+          key={child.id}
+          node={child}
+          prefix={childPrefix}
+          isLast={index === children.length - 1}
+        />
+      ))}
+    </>
+  );
+};
+ 
+const TreeView = ({ root }: { root: TreeNode }) => {
+  const children = root.children ?? [];
+  return (
+    <div className="font-mono text-sm leading-relaxed">
+      <div className="text-brand-green">{root.name}</div>
+      {children.map((child, index) => (
+        <TreeBranch
+          key={child.id}
+          node={child}
+          prefix=""
+          isLast={index === children.length - 1}
+        />
+      ))}
+    </div>
+  );
+};
+ 
+
 const HelpComponent = () => {
 
   const examples = (treeData.children ?? []).map((node) =>
@@ -24,17 +78,21 @@ const HelpComponent = () => {
         <li><span className="text-brand-green">help</span> - Show available commands</li>
         <li><span className="text-brand-green">clear</span> - Clear the terminal</li>
       </ul>
+
+      <p className="mt-4 text-white ">Here's what's in here:</p>
+      <TreeView root={treeData} />
+
       <p className="mt-4 text-white">
         New to the terminal? Try typing any of these:
       </p>
-      <ul className="my-1 list-none">
+       <ul className="mt-1 list-none">
         <li>
-          {/* <span className="text-brand-yellow">$</span>{" "} */}
+          <span className="text-brand-yellow">$</span>{" "}
           <span className="text-brand-green">ll</span>
         </li>
         {examples.map((cmd) => (
           <li key={cmd}>
-            {/* <span className="text-brand-yellow">$</span>{" "} */}
+            <span className="text-brand-yellow">$</span>{" "}
             <span className="text-brand-green">{cmd}</span>
           </li>
         ))}
