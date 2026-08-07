@@ -65,7 +65,7 @@ const HelpComponent = () => {
   );
 
   return (
-    <div className="mt-4 text-white text-lg">
+    <div className="mt-4 text-white">
       {/* <p> */}
         Interactive terminal-styled portfolio built with React, TypeScript & Vite 
         — navigate projects with real shell commands (ll, cd, cat).
